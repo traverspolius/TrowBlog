@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TrowBlog.Web.Data;
+using TrowBlog.Web.Models;
+using TrowBlog.Web.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +12,14 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ApplicationDbContext>(options=>options.UseSqlServer(connectionString));
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IDbInitializer, DBInitializer>();
+
 var app = builder.Build();
+DataSeeding();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -31,3 +41,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void DataSeeding()
+{
+    using(var scope = app.Services.CreateScope())
+    {
+        var DbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        DbInitializer.Initialize();
+    }
+}
