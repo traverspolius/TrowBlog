@@ -12,7 +12,7 @@ using TrowBlog.Web.Data;
 namespace TrowBlog.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231115050823_FirstMigration")]
+    [Migration("20231203022809_FirstMigration")]
     partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
