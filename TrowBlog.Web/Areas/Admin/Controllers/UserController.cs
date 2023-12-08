@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrowBlog.Web.Models;
+using TrowBlog.Web.Utilities;
 using TrowBlog.Web.ViewModels;
 
 namespace TrowBlog.Web.Areas.Admin.Controllers
@@ -39,7 +40,60 @@ namespace TrowBlog.Web.Areas.Admin.Controllers
             return View(vm);
         }
 
-        [HttpGet("Login")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult Register() 
+        {
+            return View(new RegisterVM());
+        }
+
+		[Authorize(Roles = "Admin")]
+		[HttpPost]
+		public async Task<IActionResult> Register(RegisterVM vm)
+		{
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            var checkUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if(checkUserByEmail != null)
+            {
+                _notification.Error("Email already exists");
+                return View(vm);
+            }
+            var checkUserByUsername = await _userManager.FindByNameAsync(vm.UserName);  
+            if(checkUserByUsername != null)
+            {
+                _notification.Error("Username already exists");
+                return View(vm);
+            }
+
+            var applicationUser = new ApplicationUser()
+            {
+                Email = vm.Email,
+                UserName = vm.UserName,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName
+            };
+
+            var result = await _userManager.CreateAsync(applicationUser,vm.Password);
+            if (result.Succeeded)
+            {
+                if(vm.IsAdmin)
+                {
+                    await _userManager.AddToRoleAsync(applicationUser, WebsiteRoles.WebsiteAdmin);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(applicationUser, WebsiteRoles.WebsiteAdmin);
+                }
+                _notification.Success("User registered successfully");
+                return RedirectToAction("Index", "User", new { area = "Admin" });
+            }
+			return View(vm);
+		}
+
+		[HttpGet("Login")]
 		public IActionResult Login()
 		{
             if (!HttpContext.User.Identity!.IsAuthenticated)
