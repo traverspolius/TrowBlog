@@ -131,7 +131,7 @@ namespace TrowBlog.Web.Areas.Admin.Controllers
                 }
                 else
                 {
-                    await _userManager.AddToRoleAsync(applicationUser, WebsiteRoles.WebsiteAdmin);
+                    await _userManager.AddToRoleAsync(applicationUser, WebsiteRoles.WebsiteAuthor);
                 }
                 _notification.Success("User registered successfully");
                 return RedirectToAction("Index", "User", new { area = "Admin" });
@@ -146,7 +146,7 @@ namespace TrowBlog.Web.Areas.Admin.Controllers
             {
                 return View(new LoginVM());
             }
-            return RedirectToAction("Index", "User", new {area="Admin"});
+            return RedirectToAction("Index", "Post", new {area="Admin"});
 		}
 
         [HttpPost("Login")]
@@ -170,15 +170,23 @@ namespace TrowBlog.Web.Areas.Admin.Controllers
             }
             await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, vm.RememberMe, true);
             _notification.Success("Login Successful!");
-            return RedirectToAction("Index", "User", new { area = "Admin" });
+            return RedirectToAction("Index", "Post", new { area = "Admin" });
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Logout()
         {
             _signInManager.SignOutAsync();
             _notification.Success("You are logged out successfully");
             return RedirectToAction("Index", "Home", new {area = ""});
+        }
+
+        [HttpGet("AccessDenied")]
+        [Authorize]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
