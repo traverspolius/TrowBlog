@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TrowBlog.Web.ViewModels;
 
 namespace TrowBlog.Web.Areas.Admin.Controllers
 {
@@ -15,7 +16,7 @@ namespace TrowBlog.Web.Areas.Admin.Controllers
 		[HttpGet]
 		public IActionResult Create()
 		{
-			return View();
+			return View(new CreatePostVM());
 		}
 	}
 }
