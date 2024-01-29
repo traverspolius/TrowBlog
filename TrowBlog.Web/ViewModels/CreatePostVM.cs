@@ -1,10 +1,12 @@
-﻿using TrowBlog.Web.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using TrowBlog.Web.Models;
 
 namespace TrowBlog.Web.ViewModels
 {
     public class CreatePostVM
     {
         public int Id { get; set; }
+        [Required]
         public string? Title { get; set; }
         public string? ShortDescription { get; set; }
         public string? ApplicationUserId { get; set; }
